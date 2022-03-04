@@ -1,0 +1,13 @@
+---- fmi2CoSimulation Matches (2 in 1 files) ----
+main in client_test.cpp : 
+
+  auto c = fmi2Instantiate("bb", fmi2CoSimulation, "{8c4e810f-3df3-4a00-8276-176fa3c9f003}", "", &functions, fmi2False, fmi2False);
+
+  if (!c) {
+	  cout << "Failed to instantiate FMU." << endl;
+client_test.cpp line 143 : 
+
+	auto c = instantiate("bb", fmi2CoSimulation, "{8c4e810f-3df3-4a00-8276-176fa3c9f003}", "", &functions, fmi2False, fmi2False);
+
+    if (!c) {
+        cout << "Failed to instantiate FMU." << endl;
