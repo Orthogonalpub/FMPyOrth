@@ -1,6 +1,13 @@
 """ Entry point for the graphical user interface """
 
+##### local run, set module load path ###### 
+#1, export PYTHONPATH=/root/fmi/FMPyOrth/:/usr/local/lib/python3.6/dist-packages
+#2, sundials library copy to local fmpy folder
+#3, python3 -m fmpy.gui
+
+
 if __name__ == '__main__':
+
 
     import os
     import sys

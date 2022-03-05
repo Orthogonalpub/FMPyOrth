@@ -1,5 +1,6 @@
 import os
 from ctypes import *
+
 from .. import platform, sharedLibraryExtension
 
 library_dir, _ = os.path.split(__file__)
