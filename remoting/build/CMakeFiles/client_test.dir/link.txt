@@ -1,1 +1,0 @@
-/usr/bin/c++    -static-libgcc -static-libstdc++    -rdynamic -pthread CMakeFiles/client_test.dir/client_test.cpp.o  -o client_test  -Wl,-rpath,/root/share/FMPy-master/remoting/build -lpthread client_tcp.so -ldl /usr/local/lib/librpc.a -pthread 
