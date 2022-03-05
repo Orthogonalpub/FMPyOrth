@@ -48,6 +48,9 @@ static char *s_instanceName = nullptr;
 #define NOT_IMPLEMENTED return fmi2Error;
 
 
+string server_ip="255.255.255.255";
+
+
 /***************************************************
 Types for Common Functions
 ****************************************************/

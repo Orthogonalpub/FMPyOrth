@@ -45,7 +45,20 @@ void logger(fmi2ComponentEnvironment componentEnvironment, fmi2String instanceNa
 #define CALL(f) if ((status = f) != fmi2OK) goto out;
 
 
+
+extern string server_ip;
+
+
 int main(int argc, char *argv[]) {
+
+   if ( argc !=2 ){
+       printf("\nError!  Usage:  %s serverip \n\n ", argv[0]);
+       exit(-1);
+   }
+
+   server_ip = argv[1];
+
+
 
   //rpc::client rpclient("localhost", 8080);
   //string input, result;
