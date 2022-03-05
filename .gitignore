@@ -1,3 +1,4 @@
 remoting/build/*
 *.si4project
 .idea
+*.pyc

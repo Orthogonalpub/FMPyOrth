@@ -161,6 +161,7 @@ class _FMU(object):
         except Exception as e:
             raise Exception("Failed to load shared library %s. %s" % (libraryPath, e))
 
+
         # change back to the working directory
         os.chdir(work_dir)
 
