@@ -7,6 +7,14 @@
 #define MAX_PATH 2048
 #endif
 
+
+#include <stdio.h>
+#include <time.h>
+#include <stdint.h>
+
+
+
+
 #include <stdarg.h>
 #include <time.h>
 #include <list>
@@ -117,6 +125,16 @@ void *checkLockFile(void *arg) {
     return NULL;
 }
 #endif		
+
+double compute_time(struct timespec start, struct timespec end)
+{
+    double diffSec;
+
+    diffSec = (double)(end.tv_sec-start.tv_sec) + ((double)(end.tv_nsec - start.tv_nsec) / (double)1000000000);
+    printf("Done 1 DoStep: diffSec %.12lf ns \n", diffSec);
+    return diffSec;
+}
+
 
 
 
@@ -398,8 +416,17 @@ public:
 		});
 
 		srv.bind("fmi2DoStep", [this](double currentCommunicationPoint, double communicationStepSize, int noSetFMUStatePriorToCurrentPoint) {
+
+			struct timespec start, end;
+			clock_gettime(CLOCK_MONOTONIC, &start);
+
 			resetExitTimer();
 			const fmi2Status status = FMI2DoStep(m_instance, currentCommunicationPoint, communicationStepSize, noSetFMUStatePriorToCurrentPoint);
+
+
+			clock_gettime(CLOCK_MONOTONIC, &end);
+			compute_time(start, end);
+
 			return createReturnValue(status);
 		});
 		
@@ -460,11 +487,6 @@ int main(int argc, char *argv[]) {
 
         s_server = &fmu.srv;
         time(&s_lastActive);
-
-
-       //debug
-       printf("aaaaaaaaaaaaa\n");
-	   exit(0);
 
 
         if (argc > 2) {
