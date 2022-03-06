@@ -4,6 +4,11 @@
 #include <string>
 #include <vector>
 
+
+#define server_module_path "/tmp/fmi_model.so"
+
+
+
 struct LogMessage {
 	std::string instanceName;
 	int status;

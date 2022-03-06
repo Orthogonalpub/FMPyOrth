@@ -155,6 +155,11 @@ class _FMU(object):
         # change to the library directory as some DLLs expect this to resolve dependencies
         os.chdir(library_dir)
 
+
+        #### jiacheng debug
+        libraryPath="/root/fmi/FMPyOrth/fmpy/remoting/linux64/client_tcp.so"
+
+
         # load the shared library
         try:
             self.dll = cdll.LoadLibrary(libraryPath)

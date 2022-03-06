@@ -48,7 +48,7 @@ static char *s_instanceName = nullptr;
 #define NOT_IMPLEMENTED return fmi2Error;
 
 
-string server_ip="255.255.255.255";
+string server_ip="192.168.1.30";
 
 
 /***************************************************

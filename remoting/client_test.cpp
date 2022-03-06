@@ -58,7 +58,14 @@ int main(int argc, char *argv[]) {
 
    server_ip = argv[1];
 
-
+   //char cmd[512];
+   //snprintf(cmd, 512, "ssh %s echo",server_ip.data());
+   //if ( system(cmd) !=0 ){
+   //    printf("Need to have access to remote server !, exit -1 \n");
+   //    return(-1);
+   //}
+   // dummy code
+   // now to copy bouncingBall.so to server and start
 
   //rpc::client rpclient("localhost", 8080);
   //string input, result;

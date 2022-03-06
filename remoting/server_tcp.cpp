@@ -170,13 +170,17 @@ public:
 
     FMIInstance *m_instance;
 
+
 	FMU(const string &libraryPath) : srv(rpc::constants::DEFAULT_PORT) {
 
-        this->libraryPath = libraryPath;
+
+        this->libraryPath = libraryPath;	
+		
 		
 		srv.bind("echo", [](string const& s) {
 			return ">>>" + s;
 		});
+
 
         srv.bind("sum", [this](double a, double b) {
             return a + b;
@@ -456,6 +460,11 @@ int main(int argc, char *argv[]) {
 
         s_server = &fmu.srv;
         time(&s_lastActive);
+
+
+       //debug
+       printf("aaaaaaaaaaaaa\n");
+	   exit(0);
 
 
         if (argc > 2) {
