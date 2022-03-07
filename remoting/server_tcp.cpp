@@ -129,9 +129,8 @@ void *checkLockFile(void *arg) {
 double compute_time(struct timespec start, struct timespec end)
 {
     double diffSec;
-
-    diffSec = (double)(end.tv_sec-start.tv_sec) + ((double)(end.tv_nsec - start.tv_nsec) / (double)1000000000);
-    printf("Done 1 DoStep: diffSec %.12lf ns \n", diffSec);
+    diffSec = (double)(end.tv_sec-start.tv_sec)*1000000  + (double)(end.tv_nsec - start.tv_nsec)/1000;
+    printf("Done 1 DoStep: diffSec %.6lf  us \n", diffSec);
     return diffSec;
 }
 
