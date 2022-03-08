@@ -157,7 +157,7 @@ class _FMU(object):
 
 
         #### jiacheng debug
-        libraryPath="/root/fmi/FMPyOrth/fmpy/remoting/linux64/client_tcp.so"
+        libraryPath="/orthlib/client_tcp.so"
 
 
         # load the shared library
