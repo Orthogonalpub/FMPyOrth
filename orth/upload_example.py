@@ -36,15 +36,11 @@ def show_upload_status(isCompleted, fileNames):
     return dash.no_update
 
 
-if __name__ == '__main__':
-    app.run_server(debug=True, port=8051)
-
-
 
 #####################################################################
 
 if __name__ == '__main__':
-    app.run_server(host="192.168.226.130", debug=True)
+    app.run_server(host="192.168.226.130", debug=True, port=8050)
 
 
 
