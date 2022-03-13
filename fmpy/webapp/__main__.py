@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import os
 import flask
 from dash import dcc, html, Dash

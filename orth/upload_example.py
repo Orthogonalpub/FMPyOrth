@@ -2,7 +2,6 @@
 ### upload / download example :  http://www.jikedaquan.com/7449.html
 
 
-
 import dash
 import dash_uploader as du
 import dash_bootstrap_components as dbc
@@ -12,13 +11,13 @@ from dash.dependencies import Input, Output, State
 app = dash.Dash(__name__)
 
 # 配置上传文件夹
-du.configure_upload(app, folder='temp')
+du.configure_upload(app, folder='temp', use_upload_id=False)
 
 app.layout = html.Div(
     dbc.Container(
         [
             du.Upload(id='uploader'),
-            html.H5('上传中或还未上传文件！', id='upload_status')
+            html.H5(' ', id='upload_status')
         ]
     )
 )
@@ -34,8 +33,6 @@ def show_upload_status(isCompleted, fileNames):
         return '已完成上传：'+fileNames[0]
 
     return dash.no_update
-
-
 
 #####################################################################
 
