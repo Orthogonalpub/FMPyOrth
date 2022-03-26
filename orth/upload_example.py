@@ -22,7 +22,6 @@ app.layout = html.Div(
     )
 )
 
-
 @app.callback(
     Output('upload_status', 'children'),
     Input('uploader', 'isCompleted'),
@@ -37,7 +36,7 @@ def show_upload_status(isCompleted, fileNames):
 #####################################################################
 
 if __name__ == '__main__':
-    app.run_server(host="192.168.226.130", debug=True, port=8050)
+    app.run_server(host="0.0.0.0", debug=True, port=8050)
 
 
 
