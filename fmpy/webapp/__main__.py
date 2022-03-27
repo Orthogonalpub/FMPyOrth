@@ -177,8 +177,8 @@ def get_rtai_log():
 
 
 
-ip=''
-lastip='127.0.0.1'
+#ip=''
+#lastip='127.0.0.1'
 
 @app.callback(
     Output('simulate-new-button', 'children'),
@@ -191,13 +191,13 @@ lastip='127.0.0.1'
     [Input('interval-component', 'n_intervals')])
 def timer_button_status(n):
 
-    global ip, lastip
+    #global ip, lastip
 
-    ip = request.remote_addr
-    if ip!=lastip:
-        update_simulation_status( "STATUS_NONE_SIMULATION" )
+    #ip = request.remote_addr
+    #if ip!=lastip:
+    #    update_simulation_status( "STATUS_NONE_SIMULATION" )
 
-    lastip=ip 
+    #lastip=ip 
 
     global button_str
     ## global df
@@ -440,39 +440,39 @@ def gen_fmu_page( unzipdir  ):
             id='model-info-container',
         ),
     
-        dbc.Container(
-            [
-                dbc.Form(
-                    [
-                        dbc.InputGroup(
-                            [
-                                dbc.Button('Simulate', id='simulate-button', color='primary', className='mr-4'),
-                                dbc.Input(id="stop-time", value=stop_time, style={'text-align': 'right', 'width': '5rem'}),
-                                dbc.InputGroupText("s", style={'width': '2rem'}),
-                            ], className='mr-4', style={'width': '15rem'}
-                        )
-                    ],
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(rows, width=12, lg=4, style={'margin-top': '2rem'}),
-                        dbc.Col(id='result-col', width=12, lg=8),
-                    ], className='mt-4'
-                ),
-            ],
-            id='simulation-container'
-        ),
+        #dbc.Container(
+        #    [
+        #        dbc.Form(
+        #            [
+        #                dbc.InputGroup(
+        #                    [
+        #                        dbc.Button('Simulate', id='simulate-button', color='primary', className='mr-4'),
+        #                        dbc.Input(id="stop-time", value=stop_time, style={'text-align': 'right', 'width': '5rem'}),
+        #                        dbc.InputGroupText("s", style={'width': '2rem'}),
+        #                    ], className='mr-4', style={'width': '15rem'}
+        #                )
+        #            ],
+        #        ),
+        #        dbc.Row(
+        #            [
+        #                dbc.Col(rows, width=12, lg=4, style={'margin-top': '2rem'}),
+        #                dbc.Col(id='result-col', width=12, lg=8),
+        #            ], className='mt-4'
+        #        ),
+        #    ],
+        #    id='simulation-container'
+        #),
     
-        dbc.Container(
-            [
-                html.Iframe(
-                    src='/documentation/index.html',
-                    style={'width': '100%', 'height': '100%'},
-                )
-            ],
-            id='documentation-container',
-            className='p-0',
-        ),
+        #dbc.Container(
+        #    [
+        #        html.Iframe(
+        #            src='/documentation/index.html',
+        #            style={'width': '100%', 'height': '100%'},
+        #        )
+        #    ],
+        #    id='documentation-container',
+        #    className='p-0',
+        #),
     
         #html.Footer(
         #    [
@@ -515,14 +515,15 @@ def gen_fmu_page( unzipdir  ):
 
 @app.callback(
     [Output('model-info-container', 'style'),
-     Output('simulation-container', 'style'),
-     Output('documentation-container', 'style')],
+     #Output('simulation-container', 'style'),
+     #Output('documentation-container', 'style')
+     ],
     [Input("tabs", "active_tab")])
 def switch_tab(active_tab):
     return (
         {'display': 'block' if active_tab == 'model-info-tab' else 'none'},
-        {'display': 'block' if active_tab == 'simulation-tab' else 'none'},
-        {'display': 'block' if active_tab == 'documentation-tab' else 'none', 'height': '75vh'}
+        #{'display': 'block' if active_tab == 'simulation-tab' else 'none'},
+        #{'display': 'block' if active_tab == 'documentation-tab' else 'none', 'height': '75vh'}
     )
 
 
