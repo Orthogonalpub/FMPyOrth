@@ -96,7 +96,7 @@ app.layout = html.Div(
         [
             #html.Div('Orthogonal Realtime Simulation', id='testi'),
             html.H1(
-                children='Orthogonal Realtime Simulation Enviroment',
+                children='Orthogonal Model Simulation',
                 id='testi',
                 style={
                     'textAlign': 'center',
@@ -130,7 +130,7 @@ app.layout = html.Div(
             #        ]),
             dcc.Graph(id='rtos-graph'),
 
-            #dbc.Button('Simulate', id='simulate-button1', color='primary', className='mr-4'),
+            dbc.Button('Start Realtime Simulation', id='simulate-new-button', color='primary', className='mr-4'),
 
             du.Upload(id='uploader',filetypes=['fmu'] ),
 
@@ -425,29 +425,29 @@ def gen_fmu_page( unzipdir  ):
 
 
 
-@app.callback(
-    Output('result-col', 'children'),
-    [Input('simulate-button', 'n_clicks')],
-    [State('stop-time', 'value')] + states
-)
-def update_output_div(n_clicks, stop_time, *values):
-
-    fmu_filename="/root/BouncingBall/BouncingBall.zip"
-
-    try:
-
-        start_values = dict(zip(names, values))
-
-        result = simulate_fmu(filename=fmu_filename,
-                              start_values=start_values,
-                              stop_time=stop_time,
-                              output=args.output_variables)
-        fig = create_plotly_figure(result=result)
-
-        return dcc.Graph(figure=fig)
-    except Exception as e:
-        return dbc.Alert("Simulation failed. %s path[%s]" % (e, fmu_filename), color='danger'),
-
+#@app.callback(
+#    Output('result-col', 'children'),
+#    [Input('simulate-button', 'n_clicks')],
+#    [State('stop-time', 'value')] + states
+#)
+#def update_output_div(n_clicks, stop_time, *values):
+#
+#    fmu_filename="/root/BouncingBall/BouncingBall.zip"
+#
+#    try:
+#
+#        start_values = dict(zip(names, values))
+#
+#        result = simulate_fmu(filename=fmu_filename,
+#                              start_values=start_values,
+#                              stop_time=stop_time,
+#                              output=args.output_variables)
+#        fig = create_plotly_figure(result=result)
+#
+#        return dcc.Graph(figure=fig)
+#    except Exception as e:
+#        return dbc.Alert("Simulation failed. %s path[%s]" % (e, fmu_filename), color='danger'),
+#
 
 @app.callback(
     [Output('model-info-container', 'style'),
@@ -476,8 +476,6 @@ def switch_tab(active_tab):
 
 @app.callback(
     Output('upload_status', 'children'),
-    Output('rtos-graph', 'figure'),
-    Output(component_id='alogpanel', component_property='children'),
     Input('uploader', 'isCompleted'),
     State('uploader', 'fileNames')
 )
@@ -489,6 +487,25 @@ def show_upload_status(isCompleted, fileNames):
         unzipdir = extract( fmu_filename )
 
         ret = gen_fmu_page( unzipdir ) 
+
+        return (ret)
+
+
+    return dash.no_update
+
+
+
+@app.callback(
+    Output('rtos-graph', 'figure'),
+    Output(component_id='alogpanel', component_property='children'),
+    [Input('simulate-new-button', 'n_clicks')],
+)
+def show_upload_status222222(n_clicks):
+
+    if n_clicks is None or  n_clicks <=0 :
+        return dash.no_update
+
+    try:
 
         start_backend_service(  fmu_filename )
 
@@ -504,16 +521,16 @@ def show_upload_status(isCompleted, fileNames):
         #fig['layout']['legend'] = {'x': 0, 'y': 1, 'xanchor': 'left'}
 
 
-        alogtext="=====   Orthogonal RTOS running log:   =====\n"
+        alogtext="=====  Othogonal Realtime OS running log:   =====\n"
         with open("/tmp/rtai.log") as file_obj:
              for content in file_obj:
                  alogtext = alogtext + content
 
 
-        return (ret , fig,  alogtext )
+        return ( fig,  alogtext )
 
-
-    return dash.no_update
+    except Exception as e:
+        return dbc.Alert("Simulation failed. %s " % (e), color='danger'),
 
 
 
