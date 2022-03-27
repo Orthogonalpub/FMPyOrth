@@ -12,6 +12,7 @@ import plotly
 
 import pandas as pd
 
+from flask import Flask, render_template, request
 
 import fmpy
 from fmpy import read_model_description, simulate_fmu, extract
@@ -124,7 +125,6 @@ app.layout = html.Div(
 
 
 
-
             html.Div(
                     children=[
                         dcc.Interval(id='interval-component',
@@ -157,7 +157,7 @@ def clear_rtai_log():
     logfilepath="/tmp/rtai.log"
 
     f = open(logfilepath , "w")
-    f.write( "Ready to start simulation ..." )
+    f.write( " " )
     f.close()
 
 
@@ -177,11 +177,13 @@ def get_rtai_log():
 
 
 
-
+ip=''
+lastip='127.0.0.1'
 
 @app.callback(
     Output('simulate-new-button', 'children'),
     Output('simulate-new-button', 'style'),
+    Output('simulate-new-button', 'disabled'),
     Output(component_id='alogpanel', component_property='children'),
     Output(component_id='rtos-graph', component_property='style'),
     Output(component_id='fig_container', component_property='style'),
@@ -189,21 +191,29 @@ def get_rtai_log():
     [Input('interval-component', 'n_intervals')])
 def timer_button_status(n):
 
+    global ip, lastip
+
+    ip = request.remote_addr
+    if ip!=lastip:
+        update_simulation_status( "STATUS_NONE_SIMULATION" )
+
+    lastip=ip 
+
     global button_str
     ## global df
+
+
 
     current_status=get_simulation_status()
 
     if current_status.startswith ("STATUS_IN_SIMULATION"):
-        return ("Waiting", {'display': 'block'}, "simulation in progress ...", {'display': 'block'}, {'opacity': '20%'}, {'position':'relative','left':250, 'top':-250,'font-size':50, 'display':'block'} )  
-    elif current_status.startswith ("STATUS_NONE_SIMULATION"):
-        return ("  ", {'display': 'none'}, " ", {'display': 'block'}, {'opacity': '20%'}, {'display': 'none'})
+        return (button_str, {'opacity':'20%'},'disabled', "simulation in progress ...", {'display': 'block'}, {'opacity': '10%'}, {'position':'relative','left':250, 'top':-250,'font-size':50, 'display':'block'} )  
     elif current_status.startswith ("STATUS_READY_SIMULATION"):
-        return (button_str, {'display': 'block'}, get_rtai_log(), {'display': 'block'}, {'opacity': '100%'}, {'display': 'none'}  )
+        return (button_str, {'opacity':'100%'},False, get_rtai_log(), {'display': 'block'}, {'opacity': '10%'}, {'display': 'none'}  )
     elif current_status.startswith ("STATUS_DONE_SIMULATION"):
-        return (button_str, {'display': 'block'}, get_rtai_log(), {'display': 'block'}, {'opacity': '100%'}, {'display': 'none'} )
+        return (button_str, {'opacity':'100%'}, False ,get_rtai_log(), {'display': 'block'}, {'opacity': '100%'}, {'display': 'none'} )
 
-    return ("  ", {'display': 'none'}, " ", {'display': 'block'}, {'opacity': '20%'},{'display': 'none'})
+    return (button_str, {'opacity':'20%'},'disabled', " ", {'display': 'block'}, {'opacity': '10%'},{'display': 'none'})
 
 
 
@@ -387,11 +397,11 @@ def gen_fmu_page( unzipdir  ):
                     dbc.Col(
                         [
                             dbc.Row([
-                                dbc.Col(html.Span("FMI Version"), width=4),
+                                dbc.Col(html.Span("Model Version"), width=4),
                                 dbc.Col(html.Span(model_description.fmiVersion), width=8),
                             ], className='py-1'),
                             dbc.Row([
-                                dbc.Col("FMI Type", width=4),
+                                dbc.Col("Model Type", width=4),
                                 dbc.Col(', '.join(fmi_types), width=8),
                             ], className='py-1'),
                             dbc.Row([
@@ -502,6 +512,7 @@ def gen_fmu_page( unzipdir  ):
 #        return dbc.Alert("Simulation failed. %s path[%s]" % (e, fmu_filename), color='danger'),
 #
 
+
 @app.callback(
     [Output('model-info-container', 'style'),
      Output('simulation-container', 'style'),
@@ -572,7 +583,7 @@ def show_upload_status(isCompleted, fileNames):
 
         update_simulation_status( "STATUS_READY_SIMULATION" )
 
-        return (ret )
+        return (ret)
 
     return dash.no_update
 
@@ -649,7 +660,10 @@ def show_upload_status222222(n_clicks):
 
 
 
+
 #####################################################################
+
+
 
 if __name__ == '__main__':
 
