@@ -136,10 +136,10 @@ app.layout = html.Div(
             html.Div( id="fig_container" , style={'opacity':'20%'}, 
                     children=[
                         dcc.Graph(id='rtos-graph'),
-                        html.Div(id="aaaa" ),
                     ]),
 
-
+            #html.Div(id="inprogress_text",children="Simulation in progress ...",style={'position':'relative','left':250, 'top':-250,'font-size':50, 'display':'block'}),
+            html.Div(id="inprogress_text",children="Simulation in progress ...",style={'display':'block'}),
 
             dbc.Button(button_str, id='simulate-new-button', color='primary', className='mr-4', disabled = False, style={'display': 'none'}),
 
@@ -185,6 +185,7 @@ def get_rtai_log():
     Output(component_id='alogpanel', component_property='children'),
     Output(component_id='rtos-graph', component_property='style'),
     Output(component_id='fig_container', component_property='style'),
+    Output(component_id='inprogress_text', component_property='style'),
     [Input('interval-component', 'n_intervals')])
 def timer_button_status(n):
 
@@ -194,18 +195,15 @@ def timer_button_status(n):
     current_status=get_simulation_status()
 
     if current_status.startswith ("STATUS_IN_SIMULATION"):
-        ### df.drop(df.index, inplace=True)
-        return ("Waiting...", {'display': 'block'}, "simulation in progress ...", {'display': 'block'}, {'opacity': '20%'})
+        return ("Waiting", {'display': 'block'}, "simulation in progress ...", {'display': 'block'}, {'opacity': '20%'}, {'position':'relative','left':250, 'top':-250,'font-size':50, 'display':'block'} )  
     elif current_status.startswith ("STATUS_NONE_SIMULATION"):
-        df.drop(df.index, inplace=True)
-        return ("  ", {'display': 'none'}, " ", {'display': 'block'}, {'opacity': '20%'} )
+        return ("  ", {'display': 'none'}, " ", {'display': 'block'}, {'opacity': '20%'}, {'display': 'none'})
     elif current_status.startswith ("STATUS_READY_SIMULATION"):
-        return (button_str, {'display': 'block'}, get_rtai_log(), {'display': 'block'}, {'opacity': '100%'} )
+        return (button_str, {'display': 'block'}, get_rtai_log(), {'display': 'block'}, {'opacity': '100%'}, {'display': 'none'}  )
     elif current_status.startswith ("STATUS_DONE_SIMULATION"):
-        return (button_str, {'display': 'block'}, get_rtai_log(), {'display': 'block'}, {'opacity': '100%'}  )
+        return (button_str, {'display': 'block'}, get_rtai_log(), {'display': 'block'}, {'opacity': '100%'}, {'display': 'none'} )
 
-    return ("  ", {'display': 'none'}, " ", {'display': 'block'}, {'opacity': '20%'})
-
+    return ("  ", {'display': 'none'}, " ", {'display': 'block'}, {'opacity': '20%'},{'display': 'none'})
 
 
 
