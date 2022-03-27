@@ -36,6 +36,10 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP],  suppress_call
 states = []
 names  = []
 
+button_str='Start Realtime Simulation'
+simulation_status_file='/tmp/orth_job_status.txt'
+
+
 fmu_filename=''
 
 temp_folder='temp'
@@ -96,7 +100,7 @@ app.layout = html.Div(
         [
             #html.Div('Orthogonal Realtime Simulation', id='testi'),
             html.H1(
-                children='Orthogonal Model Simulation',
+                children='Orthogonal Realtime OS Simulation Environment',
                 id='testi',
                 style={
                     'textAlign': 'center',
@@ -121,18 +125,25 @@ app.layout = html.Div(
 
 
 
-            #html.Div(
-            #        children=[
-            #            dcc.Interval(id='interval-component',
-            #            interval=2 * 1000,
-            #            n_intervals=0),
-            #            ##### html.Div(id="acoolId", children=[]),
-            #        ]),
-            dcc.Graph(id='rtos-graph'),
+            html.Div(
+                    children=[
+                        dcc.Interval(id='interval-component',
+                        interval=1 * 1000,
+                        n_intervals=0),
+                        ##### html.Div(id="acoolId", children=[]),
+                    ]),
 
-            dbc.Button('Start Realtime Simulation', id='simulate-new-button', color='primary', className='mr-4'),
+            html.Div( id="fig_container" , style={'opacity':'20%'}, 
+                    children=[
+                        dcc.Graph(id='rtos-graph'),
+                        html.Div(id="aaaa" ),
+                    ]),
 
-            du.Upload(id='uploader',filetypes=['fmu'] ),
+
+
+            dbc.Button(button_str, id='simulate-new-button', color='primary', className='mr-4', disabled = False, style={'display': 'none'}),
+
+            du.Upload(id='uploader',default_style={'width':'100%'}, filetypes=['fmu'] ),
 
             html.Pre('', id='alogpanel', style={'width':'100%'}),
         ]
@@ -141,18 +152,62 @@ app.layout = html.Div(
 )
 
 
-#@app.callback(
-#    Output('acoolId', 'children'),
-#    [Input('interval-component', 'n_intervals')])
-#def timer(n):
-#    # print(asdlol) # if this line is enabled, the periodic behavior happens
-#
-#    global df
-#
-#    df = reload_df()
-#
-#    return [html.P("Cnt sec:" + str(n))]
-#    #return [html.P("")]
+
+def clear_rtai_log():
+    logfilepath="/tmp/rtai.log"
+
+    f = open(logfilepath , "w")
+    f.write( "Ready to start simulation ..." )
+    f.close()
+
+
+def get_rtai_log():
+
+    logfilepath="/tmp/rtai.log"
+
+    if not os.path.isfile( logfilepath):
+        return " "
+
+    alogtext="=====  Othogonal Realtime OS running log:   =====\n"
+    with open(logfilepath) as file_obj:
+         for content in file_obj:
+             alogtext = alogtext + content
+
+    return alogtext
+
+
+
+
+
+@app.callback(
+    Output('simulate-new-button', 'children'),
+    Output('simulate-new-button', 'style'),
+    Output(component_id='alogpanel', component_property='children'),
+    Output(component_id='rtos-graph', component_property='style'),
+    Output(component_id='fig_container', component_property='style'),
+    [Input('interval-component', 'n_intervals')])
+def timer_button_status(n):
+
+    global button_str
+    ## global df
+
+    current_status=get_simulation_status()
+
+    if current_status.startswith ("STATUS_IN_SIMULATION"):
+        ### df.drop(df.index, inplace=True)
+        return ("Waiting...", {'display': 'block'}, "simulation in progress ...", {'display': 'block'}, {'opacity': '20%'})
+    elif current_status.startswith ("STATUS_NONE_SIMULATION"):
+        df.drop(df.index, inplace=True)
+        return ("  ", {'display': 'none'}, " ", {'display': 'block'}, {'opacity': '20%'} )
+    elif current_status.startswith ("STATUS_READY_SIMULATION"):
+        return (button_str, {'display': 'block'}, get_rtai_log(), {'display': 'block'}, {'opacity': '100%'} )
+    elif current_status.startswith ("STATUS_DONE_SIMULATION"):
+        return (button_str, {'display': 'block'}, get_rtai_log(), {'display': 'block'}, {'opacity': '100%'}  )
+
+    return ("  ", {'display': 'none'}, " ", {'display': 'block'}, {'opacity': '20%'})
+
+
+
 
 
 #@app.callback(
@@ -204,7 +259,7 @@ app.layout = html.Div(
 
 
 
-def start_backend_service( fmupath_so_path ):
+def start_backend_service( fmupath_path ):
 
     import subprocess as sub
 
@@ -215,7 +270,7 @@ def start_backend_service( fmupath_so_path ):
     rtserver_fmu_path='/tmp/fmu.fmu'
 
     try:
-        cmd = "rm -rf /tmp/result.csv ; scp %s %s:%s" % (fmupath_so_path,rtserver_ip,rtserver_fmu_path)
+        cmd = "rm -rf /tmp/result.csv ; scp %s %s:%s" % (fmupath_path,rtserver_ip,rtserver_fmu_path)
         os.system( cmd )
 
         cmd = "ssh %s '/orthlib/start_server2.sh > /dev/null'" % (rtserver_ip)
@@ -474,12 +529,39 @@ def switch_tab(active_tab):
 
 
 
+def update_simulation_status( sim_status ):
+    global simulation_status_file 
+
+    f = open(simulation_status_file , "w")
+    f.write( sim_status )
+    f.close()
+
+
+def get_simulation_status():
+
+    global simulation_status_file 
+
+    if not os.path.isfile(simulation_status_file):
+        return "STATUS_NONE_SIMULATION"
+
+    f = open(simulation_status_file )
+    current_status = f.read()
+    f.close()
+
+    return current_status
+
+
+
 @app.callback(
     Output('upload_status', 'children'),
     Input('uploader', 'isCompleted'),
     State('uploader', 'fileNames')
 )
 def show_upload_status(isCompleted, fileNames):
+
+    global fmu_filename
+
+
     if isCompleted:
 
         fmu_filename = temp_folder+'/'+fileNames[0] 
@@ -487,25 +569,34 @@ def show_upload_status(isCompleted, fileNames):
         unzipdir = extract( fmu_filename )
 
         ret = gen_fmu_page( unzipdir ) 
+        
+        clear_rtai_log()
 
-        return (ret)
+        update_simulation_status( "STATUS_READY_SIMULATION" )
 
+        return (ret )
 
     return dash.no_update
 
 
 
+
 @app.callback(
     Output('rtos-graph', 'figure'),
-    Output(component_id='alogpanel', component_property='children'),
+    ####Output(component_id='alogpanel', component_property='children'),
     [Input('simulate-new-button', 'n_clicks')],
 )
 def show_upload_status222222(n_clicks):
 
+    global fmu_filename
+    global button_str
+
     if n_clicks is None or  n_clicks <=0 :
         return dash.no_update
 
+
     try:
+        update_simulation_status("STATUS_IN_SIMULATION")
 
         start_backend_service(  fmu_filename )
 
@@ -526,8 +617,9 @@ def show_upload_status222222(n_clicks):
              for content in file_obj:
                  alogtext = alogtext + content
 
+        update_simulation_status("STATUS_DONE_SIMULATION")
 
-        return ( fig,  alogtext )
+        return ( fig )
 
     except Exception as e:
         return dbc.Alert("Simulation failed. %s " % (e), color='danger'),
@@ -562,6 +654,9 @@ def show_upload_status222222(n_clicks):
 #####################################################################
 
 if __name__ == '__main__':
+
+    update_simulation_status( "STATUS_NONE_SIMULATION" )
+    
     app.run_server(host="0.0.0.0", debug=True, port=8050)
 
 
