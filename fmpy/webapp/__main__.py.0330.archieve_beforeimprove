@@ -616,9 +616,6 @@ def show_upload_status222222(n_clicks):
     if n_clicks is None or  n_clicks <=0 :
         return dash.no_update
 
-    if n_clicks>=10:     
-        n_clicks=10
-
 
     try:
         update_simulation_status("STATUS_IN_SIMULATION")
@@ -685,8 +682,7 @@ if __name__ == '__main__':
 
     update_simulation_status( "STATUS_NONE_SIMULATION" )
     
-    app.run_server(host="0.0.0.0", debug=False, port=8050)
-    # app.run_server(host="0.0.0.0", debug=True, port=8050)
+    app.run_server(host="0.0.0.0", debug=True, port=8050)
 
 
 

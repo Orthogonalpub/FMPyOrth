@@ -2,3 +2,5 @@ remoting/build/*
 *.si4project
 .idea
 *.pyc
+nohuo.out
+*temp
